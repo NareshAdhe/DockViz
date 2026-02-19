@@ -1,10 +1,7 @@
 import docker from "../config/docker.js";
 
 const formatNetworks = (networks) => {
-  const formattedNetworks = networks.map(([name, details]) => ({
-    name,
-    fullNetworkId: details.NetworkID,
-  }));
+  const formattedNetworks = networks.map(([name, details]) => name);
   return formattedNetworks;
 };
 
@@ -30,7 +27,7 @@ const formatContainers = (containers) => {
   const formattedContainers = containers.map((container) => {
     return {
       id: container.Id.substring(0, 12),
-      fullContainerId: container.Id,
+      fullId: container.Id,
       name: container.Names[0].replace(/^\//, ""),
 
       imageName: container.Image,
@@ -44,7 +41,7 @@ const formatContainers = (containers) => {
       ports: formatPorts(container.Ports),
 
       networks: formatNetworks(
-        Object.entries(container.NetworkSettings?.Networks || {}),
+        Object.entries(container.NetworkSettings?.Networks || []),
       ),
 
       volumes: formatVolumes(container.Mounts),

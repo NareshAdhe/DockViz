@@ -44,6 +44,7 @@ const ReactFlowPage = () => {
     const loadData = async () => {
       try {
         const { nodes, edges } = await loadInitialData();
+        console.log(edges);
         setNodes(nodes);
         setEdges(edges);
       } catch (error) {

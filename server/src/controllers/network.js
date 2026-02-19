@@ -15,7 +15,7 @@ const formatNetworks = (networks, containers) => {
 
     return {
       id: net.Id.substring(0, 12),
-      fullNetworkId: net.Id,
+      fullId: net.Id,
       name: net.Name,
       driver: net.Driver,
       activeContainersCount: activeCount,

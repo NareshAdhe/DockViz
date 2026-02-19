@@ -30,7 +30,7 @@ const formatImages = (images) => {
       name,
       tags,
       id: image.Id.split(":")[1]?.substring(0, 12) || "N/A",
-      fullImageId: image.Id,
+      fullId: image.Id,
       containersCount: image.Containers,
       size: formatBytes(image.Size),
       created: new Date(image.Created * 1000).toISOString(),

@@ -19,7 +19,7 @@ const nodesTransformer = (containers, images, networks) => {
 
   const networkNodes = networks.map((network, index) => {
     return {
-      id: `net-${network.id}`,
+      id: `net-${network.name}`,
       type: "network",
       position: { x: index * 250, y: 100 },
       data: network,

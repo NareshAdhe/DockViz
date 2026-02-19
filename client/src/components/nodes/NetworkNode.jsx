@@ -65,6 +65,11 @@ const NetworkNode = ({ data }) => {
         position={Position.Top}
         className={`w-3 h-3 ${styles.handle}`}
       />
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        className={`w-3 h-3 ${styles.handle}`}
+      />
 
       {/* Main Icon - Uses dynamic bg color */}
       <div
@@ -116,7 +121,7 @@ const NetworkNode = ({ data }) => {
       </div>
 
       {/* Footer: Short ID */}
-      <div className="absolute bottom-3 text-[9px] text-gray-500 font-mono">
+      <div className="absolute bottom-3 text-[9px] text-gray-400 font-mono">
         {data.id ? data.id.substring(0, 12) : ""}
       </div>
     </div>
