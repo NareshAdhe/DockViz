@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import nodesTransformer from "./nodesTransformer";
 import edgesTransformer from "./edgesTransformer";
 
-export const loadInitialData = async () => {
+const loadInitialData = async () => {
   try {
     const [containers, images, networks] = await Promise.all([
       apiService.getContainers(),
@@ -23,3 +23,5 @@ export const loadInitialData = async () => {
     }
   }
 };
+
+export default loadInitialData;

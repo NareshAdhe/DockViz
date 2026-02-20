@@ -3,56 +3,73 @@ import {
   ReactFlow,
   applyNodeChanges,
   applyEdgeChanges,
-  addEdge,
   Background,
   Controls,
+  useNodesInitialized,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback } from "react";
 import ContainerNode from "../components/nodes/ContainerNode";
 import ImageNode from "../components/nodes/ImageNode";
 import NetworkNode from "../components/nodes/NetworkNode";
-import { loadInitialData } from "../utils/initialDataLoader";
+import loadInitialData from "../utils/initialDataLoader";
+import getLayoutedElements from "../utils/autoLayout";
 import toast from "react-hot-toast";
 
 const nodeTypes = {
   container: ContainerNode,
   image: ImageNode,
-  network: NetworkNode
+  network: NetworkNode,
 };
 
 const ReactFlowPage = () => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const onNodesChange = useCallback(
-    (changes) => setNodes((prevNodes) => applyNodeChanges(changes, prevNodes)),
-    [],
-  );
+  const onNodesChange = (changes) => {
+    setNodes((prevNodes) => applyNodeChanges(changes, prevNodes));
+  };
 
-  const onEdgesChange = useCallback(
-    (changes) => setEdges((prevEdges) => applyEdgeChanges(changes, prevEdges)),
-    [],
-  );
+  const onEdgesChange = (changes) => {
+    setEdges((prevEdges) => applyEdgeChanges(changes, prevEdges));
+  };
 
-  const handleConnect = useCallback(
-    (edge) => setEdges((prevEdges) => addEdge(edge, prevEdges)),
-    [],
-  );
+  const isNodeInitialized = useNodesInitialized();
+  const { fitView } = useReactFlow();
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const { nodes, edges } = await loadInitialData();
-        console.log(edges);
         setNodes(nodes);
         setEdges(edges);
       } catch (error) {
         toast.error("Error loading initial data");
+        setIsLoading(false);
       }
     };
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (isNodeInitialized) {
+      console.log(isNodeInitialized);
+      const { layoutedNodes, layoutedEdges } = getLayoutedElements({
+        nodes,
+        edges,
+      });
+      setNodes(layoutedNodes);
+      setEdges(layoutedEdges);
+
+      window.requestAnimationFrame(() => {
+        fitView({ padding: 0.05, duration: 500 });
+      });
+
+      setIsLoading(false);
+    }
+  }, [isNodeInitialized]);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
@@ -62,11 +79,10 @@ const ReactFlowPage = () => {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={handleConnect}
-        fitView
+        nodesDeletabl={false}
         style={{ backgroundColor: "#000" }}
       >
-        <Background color="white" />
+        <Background color="blue" gap={16} />
         <Controls />
       </ReactFlow>
     </div>

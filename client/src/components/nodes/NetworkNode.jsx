@@ -59,28 +59,26 @@ const NetworkNode = ({ data }) => {
     <div
       className={`shadow-sm rounded-full bg-white border-2 ${styles.border} w-48 h-48 flex flex-col items-center justify-center transition-all ${styles.hover} hover:shadow-lg relative group`}
     >
-      {/* Input Handle (Receives connections from Containers) */}
       <Handle
         type="target"
         position={Position.Top}
+        isConnectable={false}
         className={`w-3 h-3 ${styles.handle}`}
       />
       <Handle
         type="target"
         position={Position.Bottom}
+        isConnectable={false}
         className={`w-3 h-3 ${styles.handle}`}
       />
 
-      {/* Main Icon - Uses dynamic bg color */}
       <div
         className={`${styles.bg} p-3 rounded-full mb-2 transition-transform group-hover:scale-110`}
       >
         {getIcon()}
       </div>
 
-      {/* Content */}
       <div className="text-center px-4 w-full">
-        {/* Network Name */}
         <h3
           className="font-bold text-gray-800 text-sm truncate w-full"
           title={data.name}
@@ -88,7 +86,6 @@ const NetworkNode = ({ data }) => {
           {data.name}
         </h3>
 
-        {/* Driver Badge - Uses dynamic text color & label */}
         <span
           className={`text-[10px] font-bold uppercase tracking-wider ${styles.text}`}
         >
@@ -96,7 +93,6 @@ const NetworkNode = ({ data }) => {
         </span>
       </div>
 
-      {/* Stats Pill */}
       <div className="mt-2 flex items-center gap-2 text-[10px] bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
         <span className="font-mono text-gray-600">
           {data.totalContainersCount !== undefined ? (
@@ -120,9 +116,8 @@ const NetworkNode = ({ data }) => {
         <span className="text-gray-400 text-[9px]">containers</span>
       </div>
 
-      {/* Footer: Short ID */}
       <div className="absolute bottom-3 text-[9px] text-gray-400 font-mono">
-        {data.id ? data.id.substring(0, 12) : ""}
+        {data.id}
       </div>
     </div>
   );

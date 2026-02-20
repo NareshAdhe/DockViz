@@ -5,6 +5,8 @@ const nodesTransformer = (containers, images, networks) => {
       type: "container",
       position: { x: index * 250, y: 100 },
       data: container,
+      deletable: false,
+      connectable: false
     };
   });
 
@@ -14,6 +16,8 @@ const nodesTransformer = (containers, images, networks) => {
       type: "image",
       position: { x: index * 250, y: 100 },
       data: image,
+      deletable: false,
+      connectable: false
     };
   });
 
@@ -23,6 +27,8 @@ const nodesTransformer = (containers, images, networks) => {
       type: "network",
       position: { x: index * 250, y: 100 },
       data: network,
+      deletable: false,
+      connectable: false
     };
   });
 

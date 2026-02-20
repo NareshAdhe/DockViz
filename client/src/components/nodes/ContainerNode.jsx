@@ -53,16 +53,13 @@ const ContainerNode = ({ data }) => {
         )}
       </div>
 
-      {/* Footer: Volume/Network Handles */}
-      <div className="px-3 py-1 bg-gray-50 rounded-b-md flex justify-between">
-         {/* You can add labels for handles if you want */}
+      {/* <div className="px-3 py-1 bg-gray-50 rounded-b-md flex justify-between">
          <span className="text-[10px] text-gray-400">Vol</span>
          <span className="text-[10px] text-gray-400">Net</span>
-      </div>
+      </div> */}
 
-      {/* Output: Connections to Networks or Volumes */}
-      <Handle type="target" position={Position.Top} className="w-3 h-3 bg-blue-500" />
-      <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-blue-500" />
+      <Handle type="target" position={Position.Top} isConnectable={false} className="w-3 h-3 bg-blue-500" />
+      <Handle type="source" position={Position.Bottom} isConnectable={false} className="w-3 h-3 bg-blue-500" />
     </div>
   );
 };

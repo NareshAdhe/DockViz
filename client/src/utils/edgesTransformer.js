@@ -16,7 +16,7 @@ const edgesTransformer = (containers) => {
         type:"straight",
         source: `cont-${container.id}`,
         target: `net-${networkName}`,
-        animated: true
+        animated: container.state === "running" ? true : false
       });
     });
   });
