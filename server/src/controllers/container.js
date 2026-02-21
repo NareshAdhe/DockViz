@@ -60,6 +60,20 @@ export const getContainers = async (req, res) => {
     return res.status(200).json(formattedContainers);
   } catch (error) {
     console.error(`[Container Error]: ${error}`);
-    return res.status(500).json("Failed to fetch containers from Docker daemon");
+    return res
+      .status(500)
+      .json("Failed to fetch containers from Docker daemon");
+  }
+};
+
+export const stopContainer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const container = docker.getContainer(id);
+    await container.stop();
+    return res.status(200).json("Container Stopped Successfully");
+  } catch (error) {
+    console.error(`[Container Error]: ${error}`);
+    return res.status(500).json("Error Stopping Container");
   }
 };

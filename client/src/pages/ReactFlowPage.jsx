@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ReactFlow,
   applyNodeChanges,
@@ -7,9 +7,9 @@ import {
   Controls,
   useNodesInitialized,
   useReactFlow,
+  MarkerType
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback } from "react";
 import ContainerNode from "../components/nodes/ContainerNode";
 import ImageNode from "../components/nodes/ImageNode";
 import NetworkNode from "../components/nodes/NetworkNode";
@@ -21,6 +21,19 @@ const nodeTypes = {
   container: ContainerNode,
   image: ImageNode,
   network: NetworkNode,
+};
+
+const defaultEdgeOptions = {
+  style: { 
+    strokeWidth: 2, 
+    stroke: '#9ca3af'
+  },
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+    width: 10,
+    height: 10,
+    color: '#9ca3af',
+  },
 };
 
 const ReactFlowPage = () => {
@@ -55,7 +68,6 @@ const ReactFlowPage = () => {
 
   useEffect(() => {
     if (isNodeInitialized) {
-      console.log(isNodeInitialized);
       const { layoutedNodes, layoutedEdges } = getLayoutedElements({
         nodes,
         edges,
@@ -63,10 +75,7 @@ const ReactFlowPage = () => {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
 
-      window.requestAnimationFrame(() => {
-        fitView({ padding: 0.05, duration: 500 });
-      });
-
+      fitView();
       setIsLoading(false);
     }
   }, [isNodeInitialized]);
@@ -79,10 +88,10 @@ const ReactFlowPage = () => {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        nodesDeletabl={false}
+        defaultEdgeOptions={defaultEdgeOptions}
         style={{ backgroundColor: "#000" }}
       >
-        <Background color="blue" gap={16} />
+        <Background color="black" gap={16} />
         <Controls />
       </ReactFlow>
     </div>

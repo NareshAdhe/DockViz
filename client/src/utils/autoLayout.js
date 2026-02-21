@@ -21,7 +21,6 @@ const getLayoutedElements = ({ nodes, edges }) => {
 
   const layoutedNodes = nodes.map((node) => {
     const layoutedNode = dagreGraph.node(node.id);
-    console.log(layoutedNode);
     const width = node.measured?.width ?? 250;
     const height = node.measured?.height ?? 150;
 

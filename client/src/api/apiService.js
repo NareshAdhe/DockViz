@@ -16,5 +16,11 @@ export const apiService = {
     getVolumes: async () => {
         const response = await api.get("/volumes");
         return response.data;
+    },
+
+    // container management
+    stopContainer: async (id) => {
+        const response = await api.post(`/containers/stop/${id}`);
+        return response.data;
     }
 }

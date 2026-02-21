@@ -20,6 +20,7 @@ app.use(cors({
     origin: process.env.FRONTEND_URL
 }));
 app.use(express.json());
+express.urlencoded({extended: true});
 
 app.use('/api/containers',containerRouter);
 app.use('/api/images',imageRouter);

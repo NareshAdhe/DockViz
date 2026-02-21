@@ -6,6 +6,8 @@ const edgesTransformer = (containers) => {
       id: `img-${container.imageId}--cont-${container.id}`,
       source: `img-${container.imageId}`,
       target: `cont-${container.id}`,
+      deletable: false,
+      animated: container.state === "running" ? true : false,
     }),
   );
 
@@ -13,10 +15,10 @@ const edgesTransformer = (containers) => {
     (container.networks || []).forEach((networkName) => {
       edges.push({
         id: `cont-${container.id}--net-${networkName}`,
-        type:"straight",
         source: `cont-${container.id}`,
         target: `net-${networkName}`,
-        animated: container.state === "running" ? true : false
+        animated: container.state === "running" ? true : false,
+        deletable: false
       });
     });
   });
