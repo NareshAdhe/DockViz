@@ -42,7 +42,6 @@ const formatImages = (images) => {
 export const getImages = async (req, res) => {
   try {
     const images = await docker.listImages();
-    console.log(images);
     const formattedImages = formatImages(images);
 
     return res.status(200).json(formattedImages);

@@ -1,6 +1,6 @@
 import React, { useState, memo } from "react";
-import { Handle, Position, useReactFlow } from "@xyflow/react";
-import { Box, Globe, Square, Loader2 } from "lucide-react";
+import { Handle, Position } from "@xyflow/react";
+import { Box, Globe, Square, Loader2, Play } from "lucide-react";
 import toast from "react-hot-toast";
 
 const getStatusColor = (status) => {
@@ -17,50 +17,22 @@ const getStatusColor = (status) => {
 };
 
 const ContainerNode = ({ data }) => {
-  const [isStopping, setIsStopping] = useState(false);
+  const [isChanging, setIsChanging] = useState(false);
   const statusColor = getStatusColor(data.state);
+  const isRunning = data.state === "running";
 
-  const { setNodes, setEdges } = useReactFlow();
-
-  const onStop = async () => {
-    setIsStopping(true);
+  const onChange = async () => {
+    setIsChanging(true);
     try {
-      await toast.promise(data.onStopContainer(data.fullId), {
-        loading: "Stopping container...",
-        success: "Container stopped successfully!",
-        error: "Failed to stop container.",
+      await toast.promise(isRunning ? data.onStopContainer(data.fullId) : data.onStartContainer(data.fullId), {
+        loading: isRunning ? "Stopping container..." : "Starting container...",
+        success: isRunning ? "Container Stopped Successfully" : "Container Started Successfully",
+        error: isRunning ? "Failed to stop the container" : "Failed to start the container",
       });
-
-      setNodes((nodes) =>
-        nodes.map((node) => {
-          if (node.type === "container" && node.data.fullId === data.fullId) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                state: "exited",
-              },
-            };
-          }
-          return node;
-        }),
-      );
-      setEdges((edges) => (
-        edges.map((edge) => {
-          console.log(edge);
-          if(edge.source === `cont-${data.id}` || edge.target === `cont-${data.id}`){
-            return {
-              ...edge,
-              animated: false
-            }
-          }
-          return edge;
-        })
-      ))
     } catch (error) {
       console.error(error.message);
     } finally {
-      setIsStopping(false);
+      setIsChanging(false);
     }
   };
 
@@ -111,24 +83,44 @@ const ContainerNode = ({ data }) => {
         )}
       </div>
 
-      {data.state === "running" && (
+      {isRunning ? (
         <div className="p-2 bg-gray-50 border-t border-gray-100 flex justify-end">
           <button
-            onClick={onStop}
-            disabled={isStopping}
+            onClick={onChange}
+            disabled={isChanging}
             className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded transition-colors
             ${
-              isStopping
+              isChanging
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                 : "text-red-600 bg-red-100 hover:bg-red-200"
             }`}
           >
-            {isStopping ? (
+            {isChanging ? (
               <Loader2 size={12} className="animate-spin" />
             ) : (
               <Square size={12} fill="currentColor" />
             )}
-            {isStopping ? "Stopping..." : "Stop"}
+            {isChanging ? "Stopping..." : "Stop"}
+          </button>
+        </div>
+      ) : (
+        <div className="p-2 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button
+            onClick={onChange}
+            disabled={isChanging}
+            className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded transition-colors
+            ${
+              isChanging
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "text-green-600 bg-green-100 hover:bg-green-200"
+            }`}
+          >
+            {isChanging ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : (
+              <Play size={12} fill="currentColor" />
+            )}
+            {isChanging ? "Starting..." : "Start"}
           </button>
         </div>
       )}

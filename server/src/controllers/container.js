@@ -70,10 +70,22 @@ export const stopContainer = async (req, res) => {
   try {
     const { id } = req.params;
     const container = docker.getContainer(id);
-    await container.stop();
+    await container.kill();
     return res.status(200).json("Container Stopped Successfully");
   } catch (error) {
     console.error(`[Container Error]: ${error}`);
     return res.status(500).json("Error Stopping Container");
+  }
+};
+
+export const startContainer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const container = docker.getContainer(id);
+    await container.start();
+    return res.status(200).json("Container Started Successfully");
+  } catch (error) {
+    console.error(`[Container Error]: ${error}`);
+    return res.status(500).json("Error Starting Container");
   }
 };

@@ -3,10 +3,8 @@ import { Handle, Position } from "@xyflow/react";
 import { Network, Globe, Shield } from "lucide-react";
 
 const NetworkNode = ({ data }) => {
-  // 1. Normalize driver to lowercase to handle "NULL", "Null", "null" safely
   const driverType = (data.driver || "bridge").toLowerCase();
 
-  // 2. Icon Logic: Choose icon based on driver type
   const getIcon = () => {
     switch (driverType) {
       case "host":
@@ -19,7 +17,6 @@ const NetworkNode = ({ data }) => {
     }
   };
 
-  // 3. Style Logic: Returns a theme object for Blue (Host), Gray (Null), or Orange (Bridge)
   const getStyles = () => {
     switch (driverType) {
       case "host":
@@ -39,9 +36,9 @@ const NetworkNode = ({ data }) => {
           bg: "bg-gray-200",
           handle: "bg-gray-500",
           text: "text-gray-500",
-          label: "ISOLATION", // Better label than "NULL"
+          label: "ISOLATION",
         };
-      default: // Bridge and others
+      default:
         return {
           border: "border-orange-300",
           hover: "hover:border-orange-500",

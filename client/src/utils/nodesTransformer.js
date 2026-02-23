@@ -1,9 +1,10 @@
+import api from "../api/apiClient";
 import { apiService } from "../api/apiService";
 
 const nodesTransformer = (containers, images, networks) => {
   const containerNodes = containers.map((container, index) => {
     return {
-      id: `cont-${container.id}`,
+      id: container.fullId,
       type: "container",
       position: { x: index * 250, y: 100 },
       deletable: false,
@@ -13,13 +14,16 @@ const nodesTransformer = (containers, images, networks) => {
         onStopContainer: async (id) => {
           return await apiService.stopContainer(id);
         },
+        onStartContainer: async (id) => {
+          return await apiService.startContainer(id);
+        }
       },
     };
   });
 
   const imageNodes = images.map((image, index) => {
     return {
-      id: `img-${image.id}`,
+      id: image.fullId,
       type: "image",
       position: { x: index * 250, y: 100 },
       data: image,
@@ -30,7 +34,7 @@ const nodesTransformer = (containers, images, networks) => {
 
   const networkNodes = networks.map((network, index) => {
     return {
-      id: `net-${network.name}`,
+      id: network.name,
       type: "network",
       position: { x: index * 250, y: 100 },
       data: network,

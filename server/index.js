@@ -3,6 +3,7 @@ import cors from 'cors';
 import http from 'http';
 import { initSocket } from './src/config/socket.js';
 import socketServices from './src/utils/socketServices.js';
+import dockerEvents from './src/utils/dockerEvents.js';
 import containerRouter from './src/routes/container.js';
 import imageRouter from './src/routes/image.js';
 import networkRouter from './src/routes/network.js';
@@ -15,6 +16,8 @@ const server = http.createServer(app);
 
 const io = initSocket(server);
 socketServices(io);
+
+dockerEvents(io);
 
 app.use(cors({
     origin: process.env.FRONTEND_URL

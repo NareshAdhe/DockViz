@@ -7,7 +7,7 @@ import {
   Controls,
   useNodesInitialized,
   useReactFlow,
-  MarkerType
+  MarkerType,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import ContainerNode from "../components/nodes/ContainerNode";
@@ -16,6 +16,7 @@ import NetworkNode from "../components/nodes/NetworkNode";
 import loadInitialData from "../utils/initialDataLoader";
 import getLayoutedElements from "../utils/autoLayout";
 import toast from "react-hot-toast";
+import socket from "../utils/socket";
 
 const nodeTypes = {
   container: ContainerNode,
@@ -24,15 +25,15 @@ const nodeTypes = {
 };
 
 const defaultEdgeOptions = {
-  style: { 
-    strokeWidth: 2, 
-    stroke: '#9ca3af'
+  style: {
+    strokeWidth: 2,
+    stroke: "#9ca3af",
   },
   markerEnd: {
     type: MarkerType.ArrowClosed,
     width: 10,
     height: 10,
-    color: '#9ca3af',
+    color: "#9ca3af",
   },
 };
 
@@ -50,7 +51,7 @@ const ReactFlowPage = () => {
   };
 
   const isNodeInitialized = useNodesInitialized();
-  const { fitView } = useReactFlow();
+  const { fitView, updateNodeData, getNode } = useReactFlow();
 
   useEffect(() => {
     const loadData = async () => {
@@ -65,6 +66,42 @@ const ReactFlowPage = () => {
     };
     loadData();
   }, []);
+
+  useEffect(() => {
+    socket.on("container_state_change", ({ id, state }) => {
+      const containerNode = getNode(id);
+      const containerNetworks = containerNode.data.networks;
+
+      containerNetworks.forEach((networkName) => {
+        updateNodeData(networkName, (prevData) => {
+          const newObj = {
+            activeContainersCount:
+              state === "running"
+                ? prevData.data.activeContainersCount + 1
+                : prevData.data.activeContainersCount - 1,
+          };
+          return newObj;
+        });
+      });
+
+      updateNodeData(id, { state });
+
+      setEdges((prevEdges) =>
+        prevEdges.map((edge) => {
+          if (edge.source === id || edge.target === id) {
+            return {
+              ...edge,
+              animated: state === "running",
+            };
+          }
+          return edge;
+        }),
+      );
+    });
+    return () => {
+      socket.off("container_state_change");
+    };
+  }, [updateNodeData]);
 
   useEffect(() => {
     if (isNodeInitialized) {

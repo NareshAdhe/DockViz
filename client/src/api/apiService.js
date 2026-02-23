@@ -22,5 +22,9 @@ export const apiService = {
     stopContainer: async (id) => {
         const response = await api.post(`/containers/stop/${id}`);
         return response.data;
+    },
+    startContainer: async (id) => {
+        const response = await api.post(`/containers/start/${id}`);
+        return response.data;
     }
 }
