@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Layers, Database, Box } from 'lucide-react';
+import { Layers, Database, Box, Trash2 } from 'lucide-react';
 
 const ImageNode = ({ data }) => {
   const isDangling = data.name === '<none>';
@@ -15,12 +15,12 @@ const ImageNode = ({ data }) => {
 
   const handleStyle = isDangling ? 'bg-gray-400' : 'bg-purple-500';
 
-  const safeTags = data.tags || [];
-  const displayTags = safeTags.slice(0, 3);
-  const remainingTags = safeTags.length - 3;
+  const safeReferences = data.references || data.tags || [];
+  const displayTags = safeReferences.slice(0, 3);
+  const remainingTags = safeReferences.length - 3;
 
   return (
-    <div className={`rounded-lg border-l-4 w-60 transition-all duration-200 ${containerStyle}`}>
+    <div className={`rounded-lg border-l-4 w-60 transition-all duration-200 group ${containerStyle}`}>
       
       <div className={`flex items-center justify-between px-3 py-2 rounded-tr-lg ${headerStyle}`}>
         <div className="flex items-center gap-2 overflow-hidden">
@@ -30,21 +30,35 @@ const ImageNode = ({ data }) => {
           </span>
         </div>
 
-        {data.containersCount > 0 && (
-            <div className="flex items-center gap-1 text-[10px] bg-white/60 px-1.5 py-0.5 rounded-full border border-black/5" title="Active Containers">
-                <Box className="w-3 h-3"/>
-                <span className="font-semibold">{data.containersCount}</span>
-            </div>
-        )}
+        <div className="flex items-center gap-1">
+          {data.containersCount > 0 && (
+              <div className="flex items-center gap-1 text-[10px] bg-white/60 px-1.5 py-0.5 rounded-full border border-black/5" title="Active Containers">
+                  <Box className="w-3 h-3"/>
+                  <span className="font-semibold">{data.containersCount}</span>
+              </div>
+          )}
+
+          {/* Delete button */}
+          <button
+            className="p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+            title="Delete image"
+            onClick={(e) => {
+              e.stopPropagation();
+              data.onDelete?.(data);
+            }}
+          >
+            <Trash2 size={12} />
+          </button>
+        </div>
       </div>
 
       <div className="p-3 space-y-3">
         
         <div className="flex flex-wrap gap-1">
-          {safeTags.length > 0 ? (
+          {safeReferences.length > 0 ? (
             <>
               {displayTags.map((tag, i) => (
-                <span key={i} className="text-[10px] font-mono bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200 truncate max-w-25">
+                <span key={i} className="text-[10px] font-mono bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200 truncate max-w-40">
                   {tag}
                 </span>
               ))}
@@ -74,7 +88,7 @@ const ImageNode = ({ data }) => {
         type="source" 
         position={Position.Bottom} 
         isConnectable={false}
-        className={`w-3 h-3 border-2 border-white ${handleStyle}`} 
+        className={`w-3 h-3 bg-gray-400 opacity-50 cursor-not-allowed pointer-events-none`} 
       />
     </div>
   );

@@ -1,9 +1,14 @@
 import React, { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
-import { Network, Globe, Shield } from "lucide-react";
+import { Network, Globe, Shield, Trash2 } from "lucide-react";
 
 const NetworkNode = ({ data }) => {
   const driverType = (data.driver || "bridge").toLowerCase();
+
+  // Protected system networks that shouldn't be deletable
+  const isSystemNetwork = ["bridge", "host", "none"].includes(
+    (data.name || "").toLowerCase(),
+  );
 
   const getIcon = () => {
     switch (driverType) {
@@ -59,16 +64,9 @@ const NetworkNode = ({ data }) => {
       <Handle
         type="target"
         position={Position.Top}
-        isConnectable={false}
         className={`w-3 h-3 ${styles.handle}`}
       />
-      <Handle
-        type="target"
-        position={Position.Bottom}
-        isConnectable={false}
-        className={`w-3 h-3 ${styles.handle}`}
-      />
-
+                                                    
       <div
         className={`${styles.bg} p-3 rounded-full mb-2 transition-transform group-hover:scale-110`}
       >
@@ -116,6 +114,20 @@ const NetworkNode = ({ data }) => {
       <div className="absolute bottom-3 text-[9px] text-gray-400 font-mono">
         {data.id}
       </div>
+
+      {/* Delete button — hidden for system networks */}
+      {!isSystemNetwork && (
+        <button
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 border border-gray-200 text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-300 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+          title="Delete network"
+          onClick={(e) => {
+            e.stopPropagation();
+            data.onDelete?.(data);
+          }}
+        >
+          <Trash2 size={12} />
+        </button>
+      )}
     </div>
   );
 };
