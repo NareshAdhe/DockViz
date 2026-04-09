@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import {
   ReactFlow,
   applyNodeChanges,
@@ -42,13 +42,13 @@ const edgeTypes = {
 const defaultEdgeOptions = {
   style: {
     strokeWidth: 2,
-    stroke: "#9ca3af",
+    stroke: "#4b5563",
   },
   markerEnd: {
     type: MarkerType.ArrowClosed,
     width: 10,
     height: 10,
-    color: "#9ca3af",
+    color: "#4b5563",
   },
 };
 
@@ -66,6 +66,93 @@ const ReactFlowPage = () => {
   const [deleteContainerModal, setDeleteContainerModal] = useState(null);
   // Track edges we've already optimistically updated from onConnect
   const handledEdgesRef = useRef(new Set());
+
+  // Computed state for highlighting reachable topology
+  const [highlightedNodes, setHighlightedNodes] = useState(new Set());
+  const [highlightedEdges, setHighlightedEdges] = useState(new Set());
+
+  useEffect(() => {
+    if (!selectedNodeId) {
+      setHighlightedNodes(new Set());
+      setHighlightedEdges(new Set());
+      return;
+    }
+
+    const visitedNodes = new Set([selectedNodeId]);
+    const visitedEdges = new Set();
+    
+    const selectedNode = nodes.find(n => n.id === selectedNodeId);
+    if (!selectedNode) return;
+
+    if (selectedNode.type === "image") {
+      // Find all containers belonging to this image
+      const containerEdges = edges.filter(e => e.source === selectedNodeId);
+      containerEdges.forEach(e => {
+        visitedEdges.add(e.id);
+        visitedNodes.add(e.target); // container node
+        
+        // Find networks those containers are connected to
+        const networkEdges = edges.filter(ne => ne.source === e.target);
+        networkEdges.forEach(ne => {
+          visitedEdges.add(ne.id);
+          visitedNodes.add(ne.target); // network node
+        });
+      });
+    } else if (selectedNode.type === "container") {
+      // Highlight its parent image
+      const imageEdges = edges.filter(e => e.target === selectedNodeId);
+      imageEdges.forEach(e => {
+        visitedEdges.add(e.id);
+        visitedNodes.add(e.source); // image node
+      });
+      
+      // Highlight its connected networks
+      const networkEdges = edges.filter(e => e.source === selectedNodeId);
+      networkEdges.forEach(e => {
+        visitedEdges.add(e.id);
+        visitedNodes.add(e.target); // network node
+      });
+    } else if (selectedNode.type === "network") {
+      // Find all containers connected to this network
+      const containerEdges = edges.filter(e => e.target === selectedNodeId);
+      containerEdges.forEach(e => {
+        visitedEdges.add(e.id);
+        visitedNodes.add(e.source); // container node
+        
+        // Find parent images for these containers
+        const imageEdges = edges.filter(ie => ie.target === e.source);
+        imageEdges.forEach(ie => {
+          visitedEdges.add(ie.id);
+          visitedNodes.add(ie.source); // image node
+        });
+      });
+    }
+
+    setHighlightedNodes(visitedNodes);
+    setHighlightedEdges(visitedEdges);
+  }, [selectedNodeId, edges, nodes]);
+
+  const displayNodes = useMemo(() => {
+    return nodes.map((node) => ({
+      ...node,
+      style: {
+        ...(node.style || {}),
+        opacity: selectedNodeId ? (highlightedNodes.has(node.id) ? 1 : 0.2) : 1,
+        transition: "opacity 0.3s ease-in-out",
+      },
+    }));
+  }, [nodes, selectedNodeId, highlightedNodes]);
+
+  const displayEdges = useMemo(() => {
+    return edges.map((edge) => ({
+      ...edge,
+      style: {
+        ...(edge.style || {}),
+        opacity: selectedNodeId ? (highlightedEdges.has(edge.id) ? 1 : 0.1) : 1,
+        transition: "opacity 0.3s ease-in-out",
+      },
+    }));
+  }, [edges, selectedNodeId, highlightedEdges]);
 
   const onNodesChange = useCallback((changes) => {
     setNodes((prevNodes) => applyNodeChanges(changes, prevNodes));
@@ -362,7 +449,7 @@ const ReactFlowPage = () => {
                 ? {
                     ...e,
                     animated: isRunning,
-                    style: { strokeWidth: 2, stroke: "#9ca3af" },
+                    style: { strokeWidth: 2, stroke: "#6b7280" },
                   }
                 : e,
             );
@@ -546,7 +633,7 @@ const ReactFlowPage = () => {
               ? {
                   ...e,
                   animated: isRunning,
-                  style: { strokeWidth: 2, stroke: "#9ca3af" },
+                  style: { strokeWidth: 2, stroke: "#6b7280" },
                 }
               : e,
           ),
@@ -728,8 +815,8 @@ const ReactFlowPage = () => {
       <ReactFlow
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        nodes={nodes}
-        edges={edges}
+        nodes={displayNodes}
+        edges={displayEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
@@ -737,12 +824,12 @@ const ReactFlowPage = () => {
         onPaneClick={onPaneClick}
         onConnect={onConnect}
         defaultEdgeOptions={defaultEdgeOptions}
-        style={{ backgroundColor: "#000" }}
+        style={{ backgroundColor: "#09090b" }}
         fitView
         fitViewOptions={{ padding: 0.4, includeHiddenNodes: false }}
       >
-        <Background color="black" gap={16} />
-        <Controls className="bottom-4! left-4!" />
+        <Background color="#27272a" gap={20} size={1.5} />
+        <Controls className="bottom-4! left-4! bg-gray-900! border-gray-700! fill-gray-300!" />
       </ReactFlow>
 
       {/* ── Sidebar ── */}
